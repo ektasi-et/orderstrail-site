@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OrdersTrail — the complete order book for home bakers</title>
+<meta name="description" content="Take the order, price it, track it to the door, and never lose the customer. One simple order-management app for home bakers. Free early access, ₹149/month at launch.">
+<meta name="theme-color" content="#6B2D3C">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="OrdersTrail">
+<meta property="og:title" content="OrdersTrail — the complete order book for home bakers">
+<meta property="og:description" content="Take the order, price it, track it to the door, and never lose the customer. Free in early access for Android.">
+<meta name="twitter:card" content="summary">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..600&family=Instrument+Sans:ital,wght@0,400..700;1,400..600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F3EADF;
+    --cream:#FDFAF5;
+    --ink:#2C3138;
+    --muted:#6A6E76;
+    --line:#E4D8C8;
+    --accent:#C63D3D;
+    --accent-deep:#9E2424;
+    --sage:#3D7A52;
+    --sage-soft:#E6F1EA;
+    --app-bar:#6B2D3C;
+    --app-action:#E05A6F;
+    --phone:#1F2329;
+    --shadow:0 0 0 1px rgba(44,49,56,.06), 0 22px 48px -22px rgba(44,49,56,.42);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased}
+  body{background:var(--paper);color:var(--ink);font-family:"Instrument Sans",system-ui,sans-serif;font-size:17px;line-height:1.62}
+  h1,h2,h3,h4{font-family:"Fraunces",Georgia,serif;font-weight:520;line-height:1.12;letter-spacing:-.02em;text-wrap:balance}
+  a{color:inherit;text-decoration:none}
+  ::selection{background:var(--accent);color:var(--cream)}
+  .wrap{max-width:1120px;margin:0 auto;padding:0 28px}
+  button{font:inherit;cursor:pointer;background:none;border:0;color:inherit}
+
+  header.nav{position:sticky;top:0;z-index:50;background:rgba(243,234,223,.86);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+  .nav-in{display:flex;align-items:center;justify-content:space-between;height:68px}
+  .brand{display:flex;align-items:center;gap:10px;font-family:"Fraunces",serif;font-size:1.25rem;font-weight:600}
+  .mark{width:32px;height:32px;border-radius:8px;background:var(--app-bar);display:grid;place-items:center}
+  .nav-links{display:flex;align-items:center;gap:26px;font-size:.94rem;color:var(--muted)}
+  .nav-links a:hover{color:var(--ink)}
+  .btn-sm{background:var(--ink);color:var(--cream);padding:10px 18px;border-radius:999px;font-weight:600;font-size:.9rem}
+  .btn-sm:hover{background:var(--accent)}
+  .menu-btn{display:none;width:44px;height:44px;border-radius:999px}
+  .mobile-nav{display:none;border-top:1px solid var(--line);background:var(--cream);padding:12px 28px 18px}
+  .mobile-nav a{display:block;padding:12px 8px}
+  .mobile-nav.open{display:block}
+
+  .hero{padding:64px 0 80px}
+  .hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:56px;align-items:center}
+  .eyebrow{display:inline-flex;align-items:center;gap:10px;font-size:.78rem;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);font-weight:700;margin-bottom:20px}
+  .eyebrow::before{content:"";width:24px;height:1.5px;background:var(--accent)}
+  h1.head{font-size:clamp(2.35rem,5vw,3.55rem);font-weight:500;max-width:18ch}
+  h1.head em{font-style:italic;font-weight:450;color:var(--accent)}
+  .sub{margin-top:20px;font-size:1.12rem;color:var(--muted);max-width:46ch}
+  .access{margin-top:22px;display:inline-flex;flex-wrap:wrap;gap:8px;align-items:center;background:var(--cream);border:1px solid var(--line);border-radius:14px;padding:12px 16px;font-size:.92rem}
+  .access b{color:var(--sage)}
+  .access .thru{color:var(--muted);text-decoration:line-through}
+  .cta-row{display:flex;flex-wrap:wrap;gap:12px;margin-top:26px;align-items:center}
+  .btn{display:inline-flex;align-items:center;gap:10px;padding:15px 24px;border-radius:14px;font-weight:600;min-height:48px}
+  .btn-primary{background:var(--accent);color:var(--cream);box-shadow:0 12px 24px -12px rgba(198,61,61,.65)}
+  .btn-primary:hover{transform:translateY(-1px)}
+  .btn-ghost{border:1.5px solid var(--line);background:var(--cream)}
+  .btn-ghost:hover{border-color:var(--ink)}
+  .meta{margin-top:14px;font-size:.88rem;color:var(--muted)}
+
+  .phone-wrap{display:flex;justify-content:center}
+  .phone{width:300px;background:var(--phone);border-radius:34px;padding:10px;box-shadow:var(--shadow);position:relative}
+  .stamp{position:absolute;right:-10px;top:-12px;background:var(--ink);color:var(--cream);font-family:"Fraunces",serif;font-size:.75rem;font-weight:600;padding:7px 12px;border-radius:999px;transform:rotate(4deg)}
+  .screen{background:var(--paper);border-radius:26px;overflow:hidden}
+  .appbar{display:flex;align-items:center;justify-content:space-between;background:var(--app-bar);color:var(--cream);padding:14px 14px 12px}
+  .appbar-l{display:flex;align-items:center;gap:10px}
+  .cake{width:36px;height:36px;border-radius:12px;background:var(--app-action);display:grid;place-items:center}
+  .bname{font-family:"Fraunces",serif;font-size:15px;line-height:1.1}
+  .bsub{font-size:9px;letter-spacing:.14em;opacity:.7}
+  .screen-body{padding:12px;display:flex;flex-direction:column;gap:10px}
+  .wb{background:linear-gradient(135deg,var(--app-action),var(--app-bar));color:#fff;border-radius:16px;padding:12px}
+  .wb p{font-size:12px;font-weight:700;line-height:1.35}
+  .wb span{display:block;font-size:10px;font-weight:400;opacity:.8;margin-top:2px}
+  .stats{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .stat{border-radius:16px;padding:10px;color:#fff}
+  .stat.a{background:var(--app-bar)}
+  .stat.b{background:var(--app-action)}
+  .stat strong{font-family:"Fraunces",serif;font-size:1.35rem;display:block;line-height:1}
+  .stat em{font-style:normal;font-size:10px;opacity:.75}
+  .orow{background:var(--cream);border:1px solid var(--line);border-radius:12px;padding:8px 10px;display:flex;justify-content:space-between;gap:8px}
+  .orow .n{font-size:11px;font-weight:700}
+  .orow .i{font-size:10px;color:var(--muted)}
+  .pill{font-size:9px;font-weight:700;background:var(--sage-soft);color:var(--sage);border-radius:999px;padding:2px 6px}
+
+  .problem{margin:0 28px;background:var(--ink);color:var(--cream);border-radius:30px;padding:64px 0}
+  .problem .kicker{color:var(--app-action);font-size:.78rem;letter-spacing:.16em;text-transform:uppercase;font-weight:700;margin-bottom:14px}
+  .problem h2{color:var(--cream);font-size:clamp(1.7rem,3.4vw,2.45rem);font-weight:480;max-width:22ch}
+  .scenes{display:grid;grid-template-columns:1fr 1fr;gap:28px 44px;margin-top:40px}
+  .scene{display:flex;gap:12px}
+  .scene .q{font-family:"Fraunces",serif;font-style:italic;font-size:1.5rem;color:rgba(253,250,245,.35);line-height:1}
+  .scene p{color:rgba(253,250,245,.82)}
+  .problem-foot{margin-top:44px;padding-top:28px;border-top:1px solid rgba(253,250,245,.15);font-family:"Fraunces",serif;font-size:1.25rem;max-width:44ch;line-height:1.35}
+  .problem-foot em{font-style:italic;color:var(--app-action)}
+
+  section.block{padding:80px 0}
+  .kicker{font-size:.78rem;letter-spacing:.16em;text-transform:uppercase;color:var(--sage);font-weight:700;margin-bottom:12px}
+  h2.title{font-size:clamp(2rem,3.6vw,2.7rem);font-weight:500;max-width:18ch}
+  h2.title em{font-style:italic;color:var(--accent)}
+  .lead{color:var(--muted);margin-top:14px;max-width:54ch}
+
+  .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:36px;margin-top:48px}
+  .snum{width:44px;height:44px;border-radius:50%;background:var(--accent);color:var(--cream);display:grid;place-items:center;font-family:"Fraunces",serif;font-weight:600;margin-bottom:16px}
+  .step h3{font-size:1.2rem;margin-bottom:8px}
+  .step p{color:var(--muted);font-size:.97rem}
+
+  .features{background:rgba(253,250,245,.6)}
+  .tabs{display:flex;gap:8px;flex-wrap:wrap;margin:36px 0 22px}
+  .tab{min-height:44px;padding:0 18px;border-radius:999px;border:1px solid var(--line);background:var(--cream);font-weight:600;font-size:.9rem}
+  .tab[aria-selected="true"]{background:var(--ink);color:var(--cream);border-color:var(--ink)}
+  .act-copy{border-bottom:1px solid var(--line);padding-bottom:22px;margin-bottom:28px}
+  .act-copy .time{font-family:"Fraunces",serif;font-style:italic;color:var(--accent)}
+  .act-copy h3{font-size:1.7rem;margin:4px 0 8px}
+  .act-copy p{color:var(--muted);max-width:56ch}
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+  .fcard{background:var(--cream);border:1px solid var(--line);border-radius:18px;padding:24px;box-shadow:0 0 0 1px rgba(44,49,56,.04)}
+  .fcard.standout{border-color:rgba(198,61,61,.28);background:linear-gradient(150deg,#FDFAf5,#FBEAE5)}
+  .badge{display:inline-block;font-size:.68rem;letter-spacing:.06em;text-transform:uppercase;font-weight:700;color:var(--accent);background:rgba(198,61,61,.1);padding:4px 10px;border-radius:6px;margin-bottom:12px}
+  .ficon{width:40px;height:40px;border-radius:12px;background:rgba(198,61,61,.1);color:var(--accent);display:grid;place-items:center;margin-bottom:14px}
+  .fcard h4{font-size:1.22rem;margin-bottom:8px}
+  .fcard p{color:var(--muted);font-size:.96rem}
+  .panel{display:none}
+  .panel.active{display:block}
+
+  .price-grid{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center}
+  .quote{margin-top:22px;padding-left:16px;border-left:3px solid var(--sage);font-family:"Fraunces",serif;font-style:italic;font-size:1.15rem}
+  .price-box{background:var(--ink);color:var(--cream);border-radius:26px;padding:40px 36px;box-shadow:var(--shadow)}
+  .pb-kick{font-size:.78rem;letter-spacing:.16em;text-transform:uppercase;color:var(--app-action);font-weight:700}
+  .pb-free{font-family:"Fraunces",serif;font-size:3.6rem;font-weight:520;line-height:.95;margin-top:10px}
+  .pb-sub{color:rgba(253,250,245,.65);margin-top:8px}
+  .price-box ul{list-style:none;margin-top:24px;padding-top:22px;border-top:1px solid rgba(253,250,245,.15);display:grid;gap:12px}
+  .price-box li{display:flex;gap:10px;color:rgba(253,250,245,.85)}
+  .price-box li svg{flex:none;margin-top:3px;color:#80B891}
+  .pb-note{margin-top:20px;font-size:.84rem;color:rgba(253,250,245,.5)}
+
+  .faq-item{border-top:1px solid var(--line)}
+  .faq-item button{width:100%;display:flex;justify-content:space-between;gap:16px;text-align:left;padding:20px 0;font-family:"Fraunces",serif;font-size:1.12rem;font-weight:600}
+  .faq-item .a{display:none;padding:0 0 20px;color:var(--muted);max-width:62ch}
+  .faq-item.open .a{display:block}
+  .chev{transition:transform .2s;color:var(--muted)}
+  .faq-item.open .chev{transform:rotate(180deg)}
+
+  .dl{padding-bottom:80px}
+  .dl-card{background:linear-gradient(150deg,var(--accent),var(--accent-deep));color:var(--cream);border-radius:30px;padding:64px 28px;text-align:center;box-shadow:var(--shadow)}
+  .dl-card h2{color:var(--cream);font-size:clamp(2rem,3.8vw,2.8rem);max-width:20ch;margin:0 auto;font-weight:490}
+  .dl-card h2 em{font-style:italic}
+  .dl-card .sub2{color:rgba(253,250,245,.85);margin:16px auto 0;max-width:46ch}
+  .dl-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:30px}
+  .btn-dl{background:var(--cream);color:var(--accent-deep);padding:16px 28px;border-radius:14px;font-weight:700}
+  .btn-dl.secondary{background:transparent;color:var(--cream);border:1.5px solid rgba(253,250,245,.5)}
+  .dl-meta{margin-top:22px;font-size:.9rem;color:rgba(253,250,245,.75)}
+  .is-soon{opacity:.62;pointer-events:none;cursor:default;box-shadow:none}
+
+  footer{padding:48px 0 40px;border-top:1px solid var(--line)}
+  .foot-in{display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:20px}
+  .foot-in p{color:var(--muted);font-size:.9rem;max-width:42ch;margin-top:10px}
+  .foot-tag{font-family:"Fraunces",serif;font-style:italic;font-size:1.1rem}
+  .foot-legal{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-top:28px;padding-top:20px;border-top:1px solid var(--line);color:var(--muted);font-size:.86rem}
+
+  @media(max-width:860px){
+    .nav-links{display:none}
+    .menu-btn{display:grid;place-items:center}
+    .hero-grid,.scenes,.steps,.grid,.price-grid{grid-template-columns:1fr}
+    .hero{padding:40px 0 56px}
+    .problem{margin:0 16px}
+    .stamp{display:none}
+  }
+  @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="wrap nav-in">
+    <a class="brand" href="#">
+      <span class="mark" aria-hidden="true">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2.5 4h11M2.5 8h7.5M2.5 12h5.5" stroke="#FDFAF5" stroke-width="1.8" stroke-linecap="round"/><circle cx="12.2" cy="12" r="1.9" fill="#C63D3D"/></svg>
+      </span>
+      OrdersTrail
+    </a>
+    <nav class="nav-links">
+      <a href="#features">Features</a>
+      <a href="#how">How it works</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#faq">FAQ</a>
+      <a class="btn-sm" href="#get">Get early access</a>
+    </nav>
+    <button class="menu-btn" type="button" aria-label="Open menu" onclick="document.getElementById('mnav').classList.toggle('open')">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+    </button>
+  </div>
+  <nav class="mobile-nav" id="mnav">
+    <a href="#features" onclick="this.parentElement.classList.remove('open')">Features</a>
+    <a href="#how" onclick="this.parentElement.classList.remove('open')">How it works</a>
+    <a href="#pricing" onclick="this.parentElement.classList.remove('open')">Pricing</a>
+    <a href="#faq" onclick="this.parentElement.classList.remove('open')">FAQ</a>
+    <a class="btn-sm" href="#get" style="display:inline-block;margin-top:8px;text-align:center" onclick="this.parentElement.classList.remove('open')">Download for Android</a>
+  </nav>
+</header>
+
+<section class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <p class="eyebrow">The complete order book for home bakers</p>
+      <h1 class="head">Take the order, price it, track it — and <em>never lose the customer</em>.</h1>
+      <p class="sub">Your whole order book in one simple app: the taking, the pricing, the follow-through, and every customer remembered. No spreadsheets. No shop software a home kitchen can’t justify.</p>
+      <div class="access"><b>Free in early access</b> — <span class="thru">₹149/month</span> at launch</div>
+      <div class="cta-row">
+        <a class="btn btn-primary" href="orderstrail.apk" download="OrdersTrail.apk" type="application/vnd.android.package-archive" data-apk data-soon="Android app coming soon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 3v10.6l3.3-3.3 1.4 1.4L12 16.4l-4.7-4.7 1.4-1.4L12 13.6V3zM5 19h14v2H5z"/></svg>
+          <span data-apk-label>Download for Android</span>
+        </a>
+        <a class="btn btn-ghost" href="#features">See what it does</a>
+      </div>
+      <p class="meta">Android 7.0+<span class="apk-size" hidden> · ~<span data-mb></span> MB</span> · No card required</p>
+    </div>
+
+    <div class="phone-wrap">
+      <div class="phone">
+        <span class="stamp">Winback due</span>
+        <div class="screen">
+          <div class="appbar">
+            <div class="appbar-l">
+              <div class="cake">🎂</div>
+              <div>
+                <div class="bname">Rose Lane Bakes</div>
+                <div class="bsub">ORDERSTRAIL</div>
+              </div>
+            </div>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10 21a2 2 0 0 0 4 0"/></svg>
+          </div>
+          <div class="screen-body">
+            <div>
+              <div style="font-family:Fraunces,serif;font-size:17px">Hello</div>
+              <div style="font-size:11px;color:var(--muted)">Tuesday, 15 September</div>
+            </div>
+            <div class="wb">
+              <p>2 customers ordered around now last year</p>
+              <span>Reach out now — before they go elsewhere.</span>
+            </div>
+            <div class="stats">
+              <div class="stat a"><strong>3</strong><em>Orders today</em></div>
+              <div class="stat b"><strong>₹1,400</strong><em>To collect</em></div>
+            </div>
+            <div style="font-size:11px;font-weight:700">Today’s orders</div>
+            <div class="orow">
+              <div><div class="n">Priya Sharma</div><div class="i">1kg chocolate · 5:00 pm</div></div>
+              <div style="text-align:right"><span class="pill">Ready</span><div class="n">₹1,200</div></div>
+            </div>
+            <div class="orow">
+              <div><div class="n">Fatima Khan</div><div class="i">2kg butterscotch · pickup</div></div>
+              <div style="text-align:right"><span class="pill">Confirmed</span><div class="n">₹1,600</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="problem">
+    <div class="wrap">
+      <p class="kicker">It was never the baking that was hard</p>
+      <h2>You can bake anything. Running it from a chat app and a diary is the part that breaks.</h2>
+      <div class="scenes">
+        <div class="scene"><span class="q">“</span><p>A message lands at 11pm — “1kg butterscotch, the 24th, same as last time.” You’ll work out “same as last time” tomorrow. Probably.</p></div>
+        <div class="scene"><span class="q">“</span><p>You quote a price off the top of your head, shake on it, and only that night realise you forgot the delivery charge. Again.</p></div>
+        <div class="scene"><span class="q">“</span><p>Four handovers on Saturday, and somewhere in the chats is the one you promised for noon — you think.</p></div>
+        <div class="scene"><span class="q">“</span><p>A customer who ordered every birthday for three years just… stopped. Nobody followed up. You didn’t notice until now.</p></div>
+      </div>
+      <p class="problem-foot">You’re not disorganised. You’re doing the taking, the pricing, the making <em>and</em> the remembering — all at once, on a phone that was only built for chatting.</p>
+    </div>
+  </div>
+</section>
+
+<section class="block" id="how">
+  <div class="wrap">
+    <p class="kicker">Why it gets better every month</p>
+    <h2 class="title">Your order book, quietly <em>working for you</em>.</h2>
+    <p class="lead">A diary just fills up. OrdersTrail turns every order you log into the next one — customers, dates and usuals, handed back at the moment they’re about to order again.</p>
+    <div class="steps">
+      <div class="step"><div class="snum">1</div><h3>Log it once</h3><p>Type it, or share the WhatsApp message in. The person and the order are saved together — no forms first.</p></div>
+      <div class="step"><div class="snum">2</div><h3>It keeps everything in order</h3><p>Priced, scheduled, tracked to delivery — and filed against that customer, not lost in a chat thread.</p></div>
+      <div class="step"><div class="snum">3</div><h3>It brings the next one to you</h3><p>When their occasion returns, OrdersTrail nudges you first, with everything you need to win the repeat.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="block features" id="features">
+  <div class="wrap">
+    <p class="kicker">Everything the job needs, nothing it doesn’t</p>
+    <h2 class="title">One app for the whole order — <em>start to repeat</em>.</h2>
+    <div class="tabs" role="tablist">
+      <button class="tab" role="tab" aria-selected="true" data-tab="take">Take the order</button>
+      <button class="tab" role="tab" aria-selected="false" data-tab="run">Run the order</button>
+      <button class="tab" role="tab" aria-selected="false" data-tab="keep">Keep the customer</button>
+    </div>
+
+    <div class="panel active" id="take">
+      <div class="act-copy">
+        <p class="time">Take the order</p>
+        <h3>Get it down fast, and get it right.</h3>
+        <p>An order shouldn’t take longer to log than it took to agree on.</p>
+      </div>
+      <div class="grid">
+        <article class="fcard standout">
+          <span class="badge">One tap from WhatsApp</span>
+          <div class="ficon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.4 8.4 0 0 1-11.3 7.9L3 21l1.6-6.7A8.4 8.4 0 1 1 21 11.5Z"/></svg></div>
+          <h4>Share the message straight in</h4>
+          <p>Forward the customer’s WhatsApp into OrdersTrail. It reads the cake, weight, date and occasion, fills the order, and links the customer. You glance over it and save.</p>
+        </article>
+        <article class="fcard">
+          <div class="ficon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div>
+          <h4>Pull from your contacts</h4>
+          <p>New customer? Grab their name and number from your phone — no re-typing the number you’ll need for every reminder later.</p>
+        </article>
+        <article class="fcard">
+          <div class="ficon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 7h8M8 11h8"/></svg></div>
+          <h4>Price it without guessing</h4>
+          <p>The calculator totals ingredients, custom work and delivery — so you stop quoting from memory and quietly undercharging yourself.</p>
+        </article>
+      </div>
+    </div>
+
+    <div class="panel" id="run">
+      <div class="act-copy">
+        <p class="time">Run the order</p>
+        <h3>Get them all made and out the door.</h3>
+        <p>Everyday order management — no clunky POS, just what a baker actually needs.</p>
+      </div>
+      <div class="grid">
+        <article class="fcard">
+          <div class="ficon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div>
+          <h4>Track every order to the door</h4>
+          <p>New, confirmed, ready, delivered. One tap sends the right WhatsApp update for wherever it’s at — no retyping the same message.</p>
+        </article>
+        <article class="fcard">
+          <div class="ficon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 2v4M16 2v4M3 10h18"/><rect x="3" y="4" width="18" height="18" rx="2"/></svg></div>
+          <h4>See your whole week</h4>
+          <p>Every handover on a calendar. Spot the Saturday that already has four cakes — before you say yes to a fifth.</p>
+        </article>
+        <article class="fcard">
+          <div class="ficon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 15l4-5 3 3 5-7"/></svg></div>
+          <h4>Know how you’re doing</h4>
+          <p>Sales broken down on the screen. “How’s this week going?” answered in a glance — not a spreadsheet you never open.</p>
+        </article>
+      </div>
+    </div>
+
+    <div class="panel" id="keep">
+      <div class="act-copy">
+        <p class="time">Keep the customer</p>
+        <h3>The part a diary can never do.</h3>
+        <p>The order’s delivered. A diary forgets them here — this is where the next order comes from.</p>
+      </div>
+      <div class="grid">
+        <article class="fcard standout">
+          <span class="badge">The one that pays for itself</span>
+          <div class="ficon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v4h4"/></svg></div>
+          <h4>Winback — last year’s order, handed back</h4>
+          <p>Days before someone’s yearly occasion, they rise to the top of your list — with last year’s order and a message ready to send.</p>
+        </article>
+        <article class="fcard">
+          <div class="ficon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/></svg></div>
+          <h4>Every customer, remembered</h4>
+          <p>Full order history, their usual, your private notes — all in one tap. Everything you’d have to hold in your head, kept for you.</p>
+        </article>
+        <article class="fcard">
+          <div class="ficon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3 2.9 5.9 6.5.9-4.7 4.6 1.1 6.5L12 18l-5.8 3 1.1-6.5L2.6 9.8l6.5-.9L12 3Z"/></svg></div>
+          <h4>Rate the person, not the order</h4>
+          <p>A big order can still be a difficult customer. A private rating stays on the person — only you ever see it.</p>
+        </article>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="block" id="pricing">
+  <div class="wrap price-grid">
+    <div>
+      <p class="kicker">You’re early</p>
+      <h2 class="title">Free now. <em>₹149</em> when we launch.</h2>
+      <p class="lead">Use the whole app free while we’re in early access — then ₹149/month at launch. That’s less than the price of one cake a month for the tool that runs your entire order book.</p>
+      <p class="quote">One repeat order you’d otherwise have lost more than covers a whole month.</p>
+    </div>
+    <div class="price-box">
+      <div class="pb-kick">Early access</div>
+      <div class="pb-free">Free</div>
+      <div class="pb-sub">for early adopters, right now</div>
+      <p style="margin-top:12px">then <b>₹149/month</b> once OrdersTrail launches</p>
+      <ul>
+        <li><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6 9 17l-5-5"/></svg> Unlimited orders, customers and pricing</li>
+        <li><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6 9 17l-5-5"/></svg> WhatsApp capture, contact sync & status updates</li>
+        <li><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6 9 17l-5-5"/></svg> Order tracking, calendar & cake pricing calculator</li>
+        <li><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6 9 17l-5-5"/></svg> Winback reminders on every repeat occasion</li>
+        <li><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6 9 17l-5-5"/></svg> Full customer memory, ratings and tags</li>
+      </ul>
+      <p class="pb-note">No card needed to start. We’ll give you plenty of notice before anything ever changes.</p>
+    </div>
+  </div>
+</section>
+
+<section class="block" id="faq" style="padding-top:20px">
+  <div class="wrap">
+    <p class="kicker">Good questions</p>
+    <h2 class="title">Everything you might be wondering.</h2>
+    <div style="margin-top:36px">
+      <div class="faq-item open">
+        <button type="button">Is it really free right now? <svg class="chev" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg></button>
+        <p class="a">Yes — completely, no card needed, for as long as we’re in early access. When OrdersTrail launches it’ll be ₹149/month, and we’ll tell you well before that day. Anything you’ve logged stays yours.</p>
+      </div>
+      <div class="faq-item">
+        <button type="button">Do my customers need to install anything? <svg class="chev" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg></button>
+        <p class="a">No. OrdersTrail is just for you. Your customers keep ordering however they do now — usually WhatsApp — and you keep the record on your side.</p>
+      </div>
+      <div class="faq-item">
+        <button type="button">Will my orders be safe if I lose my phone? <svg class="chev" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg></button>
+        <p class="a">Yes. Your orders live in a secure cloud, not only on your phone, so signing in on a new phone brings everything back.</p>
+      </div>
+      <div class="faq-item">
+        <button type="button">Can other bakers see my customers? <svg class="chev" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg></button>
+        <p class="a">Never. Your order book is private to your own account. No other baker can reach it.</p>
+      </div>
+      <div class="faq-item">
+        <button type="button">Is this like the expensive billing software shops use? <svg class="chev" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg></button>
+        <p class="a">No, and that’s the point. Those are built for storefronts with staff, and priced for them. OrdersTrail is built for one baker and a phone.</p>
+      </div>
+      <div class="faq-item">
+        <button type="button">How do I install it? <svg class="chev" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg></button>
+        <p class="a">Tap Download, then open OrdersTrail.apk from your notifications or your Downloads folder. The first time, Android asks for permission to install apps from your browser — tap Settings, switch on “Allow from this source”, go back and tap Install. On older phones the switch is under Settings → Security → Unknown sources. You only do this once.</p>
+      </div>
+      <div class="faq-item">
+        <button type="button">What do I need to run it? <svg class="chev" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg></button>
+        <p class="a">Any Android phone on version 7.0 or newer, and the same internet connection you already use for WhatsApp.<span class="apk-size" hidden> It’s a small download, around <span data-mb></span> MB.</span></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="wrap dl" id="get">
+  <div class="dl-card">
+    <h2>Your customers are already ordering. Start <em>running it properly</em>.</h2>
+    <p class="sub2">Install OrdersTrail on your Android phone and log your next order in under a minute — free, for as long as we’re in early access.</p>
+    <div class="dl-btns">
+      <a class="btn-dl" href="orderstrail.apk" download="OrdersTrail.apk" type="application/vnd.android.package-archive" data-apk data-soon="APK coming soon"><span data-apk-label>Download the APK</span></a>
+      <a class="btn-dl secondary" href="#faq">Read the FAQ</a>
+    </div>
+    <p class="dl-meta">Android 7.0 and up<span class="apk-size" hidden> · ~<span data-mb></span> MB</span> · Free early access</p>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap foot-in">
+    <div>
+      <div class="brand">
+        <span class="mark" aria-hidden="true">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2.5 4h11M2.5 8h7.5M2.5 12h5.5" stroke="#FDFAF5" stroke-width="1.8" stroke-linecap="round"/><circle cx="12.2" cy="12" r="1.9" fill="#C63D3D"/></svg>
+        </span>
+        OrdersTrail
+      </div>
+      <p>Made for home bakers in India. In early access right now — thank you for helping shape it.</p>
+    </div>
+    <div class="foot-tag">The diary never remembers. This does.</div>
+  </div>
+  <div class="wrap foot-legal">
+    <span>© 2026 Ektasi Technology (OPC) Private Limited</span>
+  </div>
+</footer>
+
+<script>
+  document.querySelectorAll('.tab').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      document.querySelectorAll('.tab').forEach(function(b){ b.setAttribute('aria-selected','false'); });
+      document.querySelectorAll('.panel').forEach(function(p){ p.classList.remove('active'); });
+      btn.setAttribute('aria-selected','true');
+      document.getElementById(btn.getAttribute('data-tab')).classList.add('active');
+    });
+  });
+  document.querySelectorAll('.faq-item button').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var item = btn.parentElement;
+      var open = item.classList.contains('open');
+      document.querySelectorAll('.faq-item').forEach(function(i){ i.classList.remove('open'); });
+      if(!open) item.classList.add('open');
+    });
+  });
+
+  // Download buttons: read the real APK size from the server, or show
+  // "coming soon" while orderstrail.apk hasn't been uploaded yet.
+  (function(){
+    var links = document.querySelectorAll('[data-apk]');
+    if (!links.length || !window.fetch) return;
+    fetch(links[0].getAttribute('href'), {method:'HEAD', cache:'no-store'}).then(function(r){
+      var type = (r.headers.get('content-type') || '').toLowerCase();
+      if (r.status === 404 || (r.ok && type.indexOf('text/html') === 0)) {
+        links.forEach(function(a){
+          a.removeAttribute('href');
+          a.removeAttribute('download');
+          a.setAttribute('aria-disabled', 'true');
+          a.classList.add('is-soon');
+          var label = a.querySelector('[data-apk-label]');
+          if (label) label.textContent = a.getAttribute('data-soon');
+        });
+        return;
+      }
+      var bytes = parseInt(r.headers.get('content-length') || '0', 10);
+      if (!r.ok || !bytes) return;
+      var mb = String(Math.max(1, Math.round(bytes / 1048576)));
+      document.querySelectorAll('[data-mb]').forEach(function(s){ s.textContent = mb; });
+      document.querySelectorAll('.apk-size').forEach(function(s){ s.hidden = false; });
+    }).catch(function(){});
+  })();
+</script>
+</body>
+</html>
